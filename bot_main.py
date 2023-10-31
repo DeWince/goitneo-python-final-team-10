@@ -28,7 +28,7 @@ def main():
         elif command in CONTACTS_COMMANDS:
             print(CONTACTS_COMMANDS[command](contacts, args))
         elif command in NOTES_COMMANDS:
-            print(NOTES_COMMANDS[command](contacts, args))
+            print(NOTES_COMMANDS[command](notes, args))
         else:
             print("Invalid command. To see all commands use 'help'")
             contacts_commands = [key for key in CONTACTS_COMMANDS if command in key]
