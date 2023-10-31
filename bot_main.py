@@ -27,7 +27,7 @@ def main():
         elif command in COMMANDS:
             print(COMMANDS[command](contacts, args))
         else:
-            print("Invalid command. To see all commands use 'help' command")
+            print("Invalid command. To see all commands use 'help'")
             commands = [key for key in COMMANDS if command in key]
             if commands:
                 print("Most similar commands:\n" + " | ".join(commands))
