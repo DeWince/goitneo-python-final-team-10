@@ -7,8 +7,8 @@ def input_error(func):
             return func(*args, **kwargs)
         except FormatError as e:
             return "\n".join(e.args)
-        except IndexError or KeyError:
-            return "Incorrect args, provide name"
+        except (IndexError, KeyError) as e:
+            return '\n'.join(e.args) if len(e.args) else "Incorrect args, provide name"
 
     return inner
 
@@ -18,8 +18,8 @@ def contacts_search_args_error(func):
             return func(*args, **kwargs)
         except ValueError:
             return "Give me note title and its content"
-        except IndexError or KeyError:
-            return "Incorrect args, provide search string"
+        except (IndexError, KeyError) as e:
+            return "\n".join(e.args) if len(e.args) else "Incorrect args, provide search string"
 
     return inner
 
@@ -74,7 +74,7 @@ def note_search_args_error(func):
             return func(*args, **kwargs)
         except ValueError:
             return "Give me note title and its content"
-        except IndexError or KeyError:
-            return "Incorrect args, provide search string"
+        except (IndexError, KeyError) as e:
+            return '\n'.join(e.args) if len(e.args) else  "Incorrect args, provide search string"
 
     return inner
