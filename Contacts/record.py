@@ -12,44 +12,62 @@ class Record:
     }
     sets = ["phones", "emails"]
 
-    def __init__(self, name: Name, address: Address = None, phones: set = set(), emails: set = set(), birthday: Birthday = None):
-        self.name = name if type(name) == Name else Name(name)
-        self.address = address if type(address) == Address else Address(address)
-        self.birthday = birthday if type(birthday) == Birthday else Birthday(birthday)
-        self.phones = set([phone if type(phone) == Phone else Phone(phone) for phone in phones])
-        self.emails = set([email if type(email) == Email else Email(email) for email in emails])
+    def __init__(self, name: Name):
+        self.name = str(name) 
+        self.address = None
+        self.birthday = None
+        self.phones = set()
+        self.emails = set()
     # end def
 
     def __str__(self):
-        str = f"{self.name:>15}:   "
+        return_string = []
         if self.birthday != None:
-            str += f"{self.fields['birthday']}: {self.birthday:<14}"
+            return_string.append(f"{self.fields['birthday']}: {str(self.birthday):<10}")
         if len(self.phones) > 0:
-            str += f"{self.fields['phones']}: {'; '.join(self.phones)}"
+            return_string.append(f"{self.fields['phones']}: {'; '.join(self.phones)}")
         if len(self.emails) > 0:
-            str += f"{self.fields['emails']}: {'; '.join(self.emails)}"
+            return_string.append(f"{self.fields['emails']}: {'; '.join(self.emails)}")
         if self.address != None:
-            str += f"{self.fields['address']}: {self.address}"
+            return_string.append(f"{self.fields['address']}: {str(self.address)}")
         # end if
-        return str
+        
+        if len(return_string) == 0:
+            return_string = ["данні відсутні"]
+        # end if
+        
+        return_string = f"{(str(self.name)):>15}:  {(' | '.join(return_string))}"
+        return return_string
     # end def
     
     def __repr__(self):
-        str = f"Record({self.name}, {self.address}, {self.phones}, {self.emails}, {self.birthday}"
+        name = self.name
+        address = self.address or None
+        birthday = self.birthday or None
+        phones = ";".join(self.phones) if len(self.phones) else None
+        emails = ";".join(self.emails) if len(self.emails) else None
+        data_stream = [value for value in [name, address, birthday, phones, emails] if value != None]
+        
+        return_string = f"{(','.join(data_stream))}"
+        return return_string
 
     def __getitem__(self, key):
+        key = str(key)
         if key in self.__dict__:
             return self.__dict__[key]
         # end if
     # end def
 
     def __setitem__(self, key, value):
+        key = str(key)
+        value = str(value)
         if key in self.__dict__:
             self.__dict__[key] = value
         # end if
     # end def
     
     def add_info(self, type, value):
+        value = str(value)
         if type in self.sets:
             if value in self.__dict__[type]:
                 raise KeyError(f"{(self.fields[type])} вже існує")
@@ -63,17 +81,28 @@ class Record:
     
     def modify_info(self, type, old_value, new_value):
         if type in self.sets:
+            new_value = str(new_value)
+        
+            if old_value not in self.__dict__[type]:
+                raise KeyError("Запис не існує")
+            if new_value in self.__dict__[type]:
+                raise KeyError("Новий запис вже існує")
+            # end if
+            
+            self.add_info(type, new_value)
             self.delete_info(type, old_value)
-        # end if
-
-        self.add_info(type, new_value)
         # end if
     # end def
     
-    def delete_info(self, type, value=None):
+    def delete_info(self, type, value):
+        value = str(value)
         if type in self.sets:
             try:
-                self.__dict__[type].remove(value)
+                if value == "all":
+                    self.__dict__[type] = set()
+                else:
+                    self.__dict__[type].remove(value)
+                # end if
             except:
                 raise KeyError(f"{(self.fields[type])} не знайдено")
             # end try
@@ -83,79 +112,53 @@ class Record:
     # end def
 
     def add_phone(self, phone):
-        self.add_info("phone", Phone(phone))
-    # end def
-
-    def change_phone(self, old_phone=None, new_phone=None):
-        if type(old_phone) == str:
-            old_phone = Phone(old_phone)
-        if type(new_phone) == str:
-            new_phone = Phone(new_phone)
-        # end if
-
-        self.modify_info("phones", old_phone, new_phone)
+        self.add_info("phones", Phone(phone))
         
         return self
     # end def
 
-    def delete_phone(self, phone):
-        if type(phone) == str:
-            phone = Phone(phone)
-        # end if
+    def change_phone(self, old_phone, new_phone):        
+        self.modify_info("phones", old_phone, Phone(new_phone))
+        
+        return self
+    # end def
 
+    def clear_phone(self, phone):
         try:
             self.delete_info("phones", phone)
-        except:
-            pass
+        finally:
+            return self
         # end try
+    # end def
+
+    def add_mail(self, email):
+        self.add_info("emails", Email(email))
         
         return self
     # end def
 
-    def add_email(self, email):
-        self.add_info("email", Email(email))
-    # end def
-
-    def change_email(self, old_email=None, new_email=None):
-        if type(old_email) == str:
-            old_email = Email(old_email)
-        if type(new_email) == str:
-            new_email = Email(new_email)
-        # end if
-
-        self.modify_info("emails", old_email, new_email)
+    def change_mail(self, old_email, new_email):        
+        self.modify_info("emails", old_email, Email(new_email))
         
         return self
     # end def
 
-    def delete_email(self, email):
-        if type(email) == str:
-            email = Email(email)
-        # end if
-
+    def clear_mail(self, email):
         try:
             self.delete_info("emails", email)
-        except:
-            pass
+        finally:
+            return self
         # end try
+    # end def
 
+    def set_address(self, address):
+        self.add_info("address", str(Address(address)))
+        
         return self
     # end def
 
     def set_birthday(self, birthday):
-        if type(birthday) == str:
-            birthday = Birthday(birthday)
-        # end if
-        self.add_info("birthday", birthday)
-        
-        return self
-    # end def
-
-    def set_address(self, address):
-        if type(address) == str:
-            address = Address(address)
-        # end if
-        self.add_info("address", address)
+        self.add_info("birthday", str(Birthday(birthday)))
         
         return self
     # end def
