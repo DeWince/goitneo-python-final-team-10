@@ -1,6 +1,6 @@
 from collections import UserDict
 import pickle
-from note import Note
+from Notes.note import Note
 
 
 class Notes(UserDict):
@@ -40,12 +40,3 @@ class Notes(UserDict):
         with open(filename, 'rb') as file:
             self.data = pickle.load(file)
 
-
-
-notebook = Notes()
-notebook.add_note("Зустріч", "Маю зустріч завтра о 10 ранку #work")
-notebook.add_note("Покупки", "Купити молоко, хліб #shop")
-notebook.add_note("Робота", "Закінчити проект до п'ятниці #work")
-
-notes_with_work_tag = notebook.find("")
-print(notes_with_work_tag)
