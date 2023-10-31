@@ -218,7 +218,7 @@ def get_all_notes(notes, *args):
     return "\n".join(str(note) for note in notes.values())
 
 
-COMMANDS = {
+CONTACTS_COMMANDS = {
     "add-contact": add_contact,
     "find-contact": find_contact,
     "delete-contact": delete_contact,
@@ -234,7 +234,11 @@ COMMANDS = {
     "get-birthday": get_birthdays,
     "delete-birthday": delete_birthday,
     "set-address": set_address,
-    "all-contacts": get_all_contacts,
+    "all-contacts": get_all_contacts
+}
+
+
+NOTES_COMMANDS = {
     "add-note": add_note,
     "find-note": find_note,
     "edit-note": edit_note,

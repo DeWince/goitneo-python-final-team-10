@@ -4,7 +4,8 @@ from file_handler import (
 )
 from bot_commands import (
     parse_input,
-    COMMANDS,
+    CONTACTS_COMMANDS,
+    NOTES_COMMANDS,
     COMMANDS_SYNTAX
 )
 
@@ -24,13 +25,17 @@ def main():
             print("How can I help you?")
         elif command == "help":
             print("\nCommands syntax:\n" + "\n".join(COMMANDS_SYNTAX.values()))
-        elif command in COMMANDS:
-            print(COMMANDS[command](contacts, args))
+        elif command in CONTACTS_COMMANDS:
+            print(CONTACTS_COMMANDS[command](contacts, args))
+        elif command in NOTES_COMMANDS:
+            print(NOTES_COMMANDS[command](contacts, args))
         else:
             print("Invalid command. To see all commands use 'help'")
-            commands = [key for key in COMMANDS if command in key]
-            if commands:
-                print("Most similar commands:\n" + " | ".join(commands))
+            contacts_commands = [key for key in CONTACTS_COMMANDS if command in key]
+            notes_commands = [key for key in NOTES_COMMANDS if command in key]
+
+            if contacts_commands or notes_commands:
+                print("Most similar commands:\n" + " | ".join(contacts_commands + notes_commands))
 
 
 if __name__ == "__main__":
