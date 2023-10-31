@@ -19,6 +19,13 @@ class Notes(UserDict):
 
         return "\n------\n".join(matching_notes)
     
+
+
+    def edit_note(self, title):
+        pass
+
+    
+
     def delete(self, name):
         if name in self.data:
             del self.data[name]
@@ -41,5 +48,5 @@ notebook.add_note("Зустріч", "Маю зустріч завтра о 10 р
 notebook.add_note("Покупки", "Купити молоко, хліб #shop")
 notebook.add_note("Робота", "Закінчити проект до п'ятниці #work")
 
-notes_with_work_tag = notebook.find("#work")
+notes_with_work_tag = notebook.find("")
 print(notes_with_work_tag)
