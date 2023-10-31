@@ -1,59 +1,82 @@
 from collections import UserDict
 from datetime import datetime
+from Contacts.record import Record
+from Writers.FileWriter import FileWriter
 
 
 class Contacts(UserDict):
-    def add_record(self, record):
-        self.data[record.name.value] = record
+    def __init__(self, **kwargs):
+        filename = kwargs.get("filename")
+        self.data = UserDict()
+        self.database_connector = FileWriter(filename)
+        self.load()
+    # end def
 
-    def find(self, name):
-        return self.data[name]
-    
-
-    def delete(self, name):
-        if name in self.data:
-            del self.data[name]
-    
     def save(self):
-        pass
+        self.database_connector.save(self.data)
+    # end def
 
-    def load(self, filename='phonebook.bin'):
-        pass
-    
-    def get_birthdays(self, days):
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        result = {day : [] for day in days}
-        records = []
-        today = datetime.today().date()
+    def load(self):
+        self.data = UserDict(self.database_connector.load())
+    # end def
 
+    def add_record(self, record: Record):
+        if self.data.get(record.name, None):
+            raise KeyError(f"{record.name} вже існує")
+        # end if
+
+        self.data[str(record.name)] = record
+        self.save()
+        return record
+    # end def
+
+    def find_record(self, needle: str):
+        results = list()
         for record in self.data.values():
-            if(record.birthday == None):
+            representational_contact = repr(record)
+            if representational_contact.find(needle) != -1:
+                results.append(record)
+            # end if
+        # end for
+        return results
+    # end def
+
+    def get_record(self, needle: str):
+        try:
+            return self.data[needle]
+        except:
+            raise KeyError("Контакт не знайдено")
+        # end try
+    # end def
+
+    def delete_record(self, name: str):
+        try:
+            res = self.data.pop(name)
+            self.save()
+            return res
+        except:
+            raise KeyError("Контакт не знайдено")
+        # end try
+    # end def
+
+    def get_birthdays(self, days: int = 7):
+        days = int(days)
+        current_date = datetime.now().date()
+
+        next_birthdays = list()
+        for record in list(self.data.values()):
+            celebrate_day = record.get_celebrate_date(current_date.year)
+            if celebrate_day == None:
                 continue
+            # end if
 
-            birthday = record.birthday.to_datetime().date()
-            
-            birthday_this_year = birthday.replace(year = today.year) 
+            celebrate_in_future = celebrate_day >= current_date
+            celebrate_soon = (celebrate_day - current_date).days <= days
 
-            if birthday_this_year < today:
-                birthday_this_year = birthday.replace(year = today.year + 1)
-
-            day_of_week = birthday_this_year.weekday()  
-            delta_days = (birthday_this_year - today).days
-
-            if day_of_week == 5: 
-                day_of_week = 0
-                delta_days +=2
-
-            if day_of_week == 6: 
-                day_of_week = 0
-                delta_days +=1
-
-            day_name = days[day_of_week]
-            if delta_days < days:
-                result[day_name].append(record)
-
-        for item in result:
-            if len(result[item]) > 0:
-                records.extend(result[item])
-
-        return records
+            if celebrate_in_future and celebrate_soon:
+                next_birthdays.append(record)
+            # end if
+        # end for
+        return next_birthdays
+    # end def
+# end class
