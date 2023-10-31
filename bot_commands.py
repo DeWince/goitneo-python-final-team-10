@@ -17,23 +17,22 @@ def add_contact(contacts, args):
         if not contacts.contains(name):
             record = Record(name)
         else:
-            record = contacts.find(name)
+            record = contacts.get_record(name)
         # Why are we trying to add already existing contact to contact book?
         contacts.add_record(record)
         return "Contact added."
     '''
     name = args[0]
-    if not contacts.find(name):
-        contacts.add_record(Record(name))
-        return "Contact added."
-    return "Contact already exists."
+    contacts.add_record(Record(name))
+    return "Contact added."
+
 
 
 @contacts_search_args_error
 @input_error
 def find_contact(contacts, args):
     # Returns records that have "search_by" in name, address, email or phone.
-    # We can move this code to contacts.find() method
+    # We can move this code to contacts.get_record() method
     search_by = args[0]
     records = []
     for name, record in contacts.values():
@@ -63,7 +62,7 @@ def delete_contact(contacts, args):
 @input_error
 def add_phone(contacts, args):
     name, *phones = args
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     for phone in phones:
         record.add_phone(phone)
     return "Phones added."
@@ -73,7 +72,7 @@ def add_phone(contacts, args):
 @input_error
 def change_phone(contacts, args):
     name, old_phone, new_phone = args
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.change_phone(old_phone, new_phone)
     return "Phones changed."
 
@@ -82,7 +81,7 @@ def change_phone(contacts, args):
 @input_error
 def delete_phone(contacts, args):
     name, phone = args
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.delete_phone(phone)
     return "Phones deleted."
 
@@ -91,7 +90,7 @@ def delete_phone(contacts, args):
 @input_error
 def delete_all_phone(contacts, args):
     name = args[0]
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.phones = None
     return "All phones deleted."
 
@@ -100,7 +99,7 @@ def delete_all_phone(contacts, args):
 @input_error
 def add_email(contacts, args):
     name, email = args
-    record = contacts.find(name)
+    record = contacts.get_record(name)
     record.add_email(email)
     return "Emails added."
 
@@ -109,7 +108,7 @@ def add_email(contacts, args):
 @input_error
 def change_email(contacts, args):
     name, old_email, new_email = args
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.change_phone(old_email, new_email)
     return "Email changed."
 
@@ -118,7 +117,7 @@ def change_email(contacts, args):
 @input_error
 def delete_email(contacts, args):
     name, email = args
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.delete_email(email)
     return "Emails deleted."
 
@@ -127,7 +126,7 @@ def delete_email(contacts, args):
 @input_error
 def delete_all_email(contacts, args):
     name = args[0]
-    record = contacts.find(name=name)
+    record = contacts.get_record(name)
     record.email = None
     return "All emails deleted."
 
@@ -136,7 +135,7 @@ def delete_all_email(contacts, args):
 @input_error
 def set_birthday(contacts, args):
     name, birthday = args
-    record = contacts.find(name)
+    record = contacts.get_record(name)
     record.add_birthday(birthday)
     return "Birthday changed."
 
@@ -152,7 +151,7 @@ def get_birthdays(contacts, *args):
 @input_error
 def delete_birthday(contacts, args):
     name = args[0]
-    record = contacts.find(name)
+    record = contacts.get_record(name)
     record.birthday = None
     return "Birthday deleted."
 
@@ -161,7 +160,7 @@ def delete_birthday(contacts, args):
 @input_error
 def set_address(contacts, args):
     name, address = args
-    record = contacts.find(name)
+    record = contacts.get_record(name)
     record.set_address(address)
     return "Address changed."
 
@@ -188,7 +187,7 @@ def add_note(notes, args):
 @input_error
 def find_note(notes, args):
     search_by = args[0]
-    return notes.find(search_by)
+    return notes.find_record(search_by)
 
 @note_search_args_error
 @input_error
