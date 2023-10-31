@@ -45,7 +45,7 @@ class Record:
         return return_string
     # end def
 
-    def __repr__(self):
+    def haystack(self):
         name = self.name
         address = self.address or None
         birthday = self.birthday or None

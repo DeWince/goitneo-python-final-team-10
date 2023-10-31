@@ -20,8 +20,7 @@ class Contacts(UserDict):
     def find_record(self, needle: str):
         results = list()
         for record in self.data.values():
-            representational_contact = repr(record)
-            if representational_contact.find(needle) != -1:
+            if record.haystack().find(needle) != -1:
                 results.append(record)
             # end if
         # end for
