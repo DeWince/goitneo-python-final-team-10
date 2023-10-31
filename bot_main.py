@@ -32,7 +32,7 @@ def main():
         elif command in NOTES_COMMANDS:
             print(NOTES_COMMANDS[command](notes, args))
         else:
-            print("Invalid command.")
+            print("Invalid command. To see all commands use 'help' command")
             contact_commands = [key for key in CONTACT_COMMANDS if command in key]
             notes_commands = [key for key in NOTES_COMMANDS if command in key]
             if contact_commands:
