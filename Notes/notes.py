@@ -24,7 +24,20 @@ class Notes(UserDict):
     def edit_note(self, title):
         pass
 
-    
+    def add_tag(self, title, tag):
+        pass
+
+    def remove_tag(self, title, tag):
+        pass
+
+    def find_by_tag(self, tag):
+        pass
+
+    def sort_notes_by_tags(self):
+        pass
+
+
+
 
     def delete(self, name):
         try:
