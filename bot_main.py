@@ -17,7 +17,7 @@ def main():
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
-        if command in ["close", "exit"]:
+        if command in ["close", "exit", "quit"]:
             print("Good bye!")
             write_to_file(contacts, notes)
             break
