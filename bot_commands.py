@@ -87,6 +87,15 @@ def delete_phone(contacts, args):
     return "Phones deleted."
 
 
+@phone_args_error
+@input_error
+def delete_all_phone(contacts, args):
+    name = args[0]
+    record = contacts.find(name=name)
+    record.phones = None
+    return "All phones deleted."
+
+
 @email_args_error
 @input_error
 def add_email(contacts, args):
@@ -114,6 +123,15 @@ def delete_email(contacts, args):
     return "Emails deleted."
 
 
+@email_args_error
+@input_error
+def delete_all_email(contacts, args):
+    name = args[0]
+    record = contacts.find(name=name)
+    record.email = None
+    return "All emails deleted."
+
+
 @birth_args_error
 @input_error
 def set_birthday(contacts, args):
@@ -129,6 +147,14 @@ def get_birthdays(contacts, *args):
     if len(records) <= 0:
         return "No birthdays next week"
     return "Birthdays next week:\n" + "\n".join(map(str, records))
+
+
+@input_error
+def delete_birthday(contacts, args):
+    name = args[0]
+    record = contacts.find(name)
+    record.birthday = None
+    return "Birthday deleted."
 
 
 @address_args_error
@@ -164,6 +190,13 @@ def find_note(notes, args):
     search_by = args[0]
     return notes.find(search_by)
 
+@note_search_args_error
+@input_error
+def edit_note(notes, args):
+    title, new_text = args
+    notes.edit_note(title, new_text)
+    return "Note edited."
+
 
 @input_error
 def delete_note(notes, args):
@@ -173,56 +206,65 @@ def delete_note(notes, args):
 
 
 @input_error
+def delete_all_note(notes, args):
+    notes.__dict__ = None
+    return "All notes deleted."
+
+
+@input_error
 def get_all_notes(notes, *args):
     if not notes.values():
         return "No notes yet, please use 'add' command to add them"
     return "\n".join(str(note) for note in notes.values())
 
 
-CONTACT_COMMANDS = {
+COMMANDS = {
     "add-contact": add_contact,
     "find-contact": find_contact,
     "delete-contact": delete_contact,
     "add-phone": add_phone,
     "change-phone": change_phone,
     "delete-phone": delete_phone,
+    "delete-all-phone": delete_all_phone,
     "add-email": add_email,
     "change-email": change_email,
     "delete-email": delete_email,
+    "delete-all-email": delete_all_email,
     "set-birthday": set_birthday,
     "get-birthday": get_birthdays,
+    "delete-birthday": delete_birthday,
     "set-address": set_address,
-    "all-contacts": get_all_contacts
+    "all-contacts": get_all_contacts,
+    "add-note": add_note,
+    "find-note": find_note,
+    "edit-note": edit_note,
+    "delete-note": delete_note,
+    "delete-all-note": delete_all_note,
+    "all-notes": get_all_notes
 }
 
 
-CONTACT_COMMANDS_SYNTAX = {
+COMMANDS_SYNTAX = {
     "add-contact": "add-contact <name>",
     "find-contact": "find-contact <search input>",
     "delete-contact": "delete-contact <name>",
     "add-phone": "add-phone <name> <phones>",
     "change-phone": "change-phone <name> <old_phone> <new_phone>",
     "delete-phone": "delete-phone <name> <phone>",
+    "delete-all-phone": "delete-all-phone <name>",
     "add-email": "add-email <name> <email>",
     "change-email": "change-email <name> <old_email> <new_email>",
     "delete-email": "delete-email <name> <email>",
+    "delete-all-email": "delete-all-email <name>",
     "set-birthday": "set-birthday <name> <birthday>",
     "get-birthday": "get-birthdays <name>",
+    "delete-birthday": "delete-birthday <name>",
     "set-address": "set-address <name> <address>",
-    "all-contacts": "all-contacts"
-}
-
-NOTES_COMMANDS = {
-    "add-note": add_note,
-    "find-note": find_note,
-    "delete-note": delete_note,
-    "all-notes": get_all_notes
-}
-
-
-NOTES_COMMANDS_SYNTAX = {
+    "all-contacts": "all-contacts",
     "add-note": "add-note <text>",
     "find-note": "find-note <title>",
+    "edit-note": "edit-note <title> <new-text>",
     "delete-note": "delete-note <title>",
+    "delete-all-note": "delete-all-note",
     "all-notes": "all-notes"
 }
