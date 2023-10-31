@@ -27,11 +27,10 @@ class Notes(UserDict):
     
 
     def delete(self, name):
-        if name in self.data:
+        try:
             del self.data[name]
-            print(f"Note with title '{name}' has been deleted.")
-        else:
-            print(f"Note with title '{name}' not found.")
+        except KeyError:
+            raise KeyError(f"Note with title '{name}' not found.")
 
     def save(self, filename='notebook.bin'):
         with open(filename, 'wb') as file:
