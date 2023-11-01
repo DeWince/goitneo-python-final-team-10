@@ -10,7 +10,6 @@ from Errors.error_handlers import (
     FormatError,
     note_args_error
 )
-from Notes.note import Note
 
 
 @input_error
