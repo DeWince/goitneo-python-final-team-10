@@ -1,6 +1,15 @@
 from Contacts.record import Record
-from Errors.error_handlers import address_args_error, birth_args_error, contacts_search_args_error, email_args_error, \
-    input_error, note_search_args_error, phone_args_error, FormatError, note_args_error
+from Errors.error_handlers import (
+    address_args_error,
+    birth_args_error,
+    contacts_search_args_error,
+    email_args_error,
+    input_error,
+    note_search_args_error,
+    phone_args_error,
+    FormatError,
+    note_args_error
+)
 from Notes.note import Note
 
 
@@ -34,6 +43,7 @@ def find_contact(contacts, args):
     )
 
 
+
 @input_error
 def delete_contact(contacts, args):
     try:
@@ -41,6 +51,7 @@ def delete_contact(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     return "Contact deleted:\n" + str(contacts.delete_record(name))
+
 
 
 @phone_args_error
@@ -60,13 +71,14 @@ def add_phone(contacts, args):
     return "\n".join(results)
 
 
+
 @phone_args_error
 @input_error
 def change_phone(contacts, args):
     name, old_phone, new_phone = args
     record = contacts.get_record(name)
     record.change_phone(old_phone, new_phone)
-    return "Phones changed."
+    return f"Phone changed.\n{record}"    # removed 's'
 
 
 @phone_args_error
@@ -74,8 +86,8 @@ def change_phone(contacts, args):
 def delete_phone(contacts, args):
     name, phone = args
     record = contacts.get_record(name)
-    record.clear_phone(phone)
-    return "Phones deleted."
+    record.clear_phone(phone)   # changed method
+    return f"Phone deleted.\n{record}"    # removed 's'
 
 
 @phone_args_error
@@ -86,8 +98,8 @@ def delete_all_phone(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.phones = set()
-    return "All phones deleted."
+    record.clear_phone("all")    # changed method
+    return f"All phones deleted.\n{record}"
 
 
 @email_args_error
@@ -96,7 +108,7 @@ def add_email(contacts, args):
     name, email = args
     record = contacts.get_record(name)
     record.add_mail(email)
-    return "Emails added."
+    return f"Email added.\n{record}"
 
 
 @email_args_error
@@ -105,7 +117,7 @@ def change_email(contacts, args):
     name, old_email, new_email = args
     record = contacts.get_record(name)
     record.change_mail(old_email, new_email)
-    return "Email changed."
+    return f"Email changed.\n{record}"
 
 
 @email_args_error
@@ -114,7 +126,7 @@ def delete_email(contacts, args):
     name, email = args
     record = contacts.get_record(name)
     record.clear_mail(email)
-    return "Emails deleted."
+    return f"Email deleted.\n{record}"
 
 
 @email_args_error
@@ -125,8 +137,8 @@ def delete_all_email(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.emails = set()
-    return "All emails deleted."
+    record.clear_mail("all")
+    return f"All emails deleted.\n{record}"
 
 
 @birth_args_error
@@ -151,11 +163,11 @@ def get_birthday(contacts, args):
 @input_error
 def get_birthdays_celebration(contacts, *args):
     days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
-    records = contacts.get_birthdays(days)
-    if len(records) <= 0:
+    birthdays = contacts.get_birthdays(days)
+    if len(birthdays) <= 0:
         return f"No birthdays next {days} day"
     return (f"Birthdays in next {days} days:\n" +
-            "\n".join(map(str, records)))
+            "\n".join(map(str, birthdays)))
 
 
 @input_error
@@ -165,17 +177,17 @@ def delete_birthday(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.birthday = None
-    return "Birthday deleted."
+    record.set_birthday()    # changed method
+    return f"Birthday deleted.\n{record}"
 
 
 @address_args_error
 @input_error
 def set_address(contacts, args):
-    name, address = args
+    name, *address = args   # allow address to contain spaces
     record = contacts.get_record(name)
-    record.set_address(address)
-    return "Address changed."
+    record.set_address(" ".join(address))  # return spaces
+    return f"Address changed.\n{record}"
 
 
 def get_all_contacts(contacts, *args):
@@ -208,6 +220,7 @@ def find_note(notes, args):
     except IndexError:
         raise FormatError("Please provide search query!")
     return notes.find(search_by)
+
 
 
 @note_search_args_error
@@ -287,7 +300,7 @@ COMMANDS_SYNTAX = {
     "delete-all-emails": "delete-all-email <name>",
     "set-birthday": "set-birthday <name> <birthday>",
     "get-birthday": "get-birthday <name>",
-    "get-birthdays-celebration": "get-birthdays-celebration",
+    "get-birthdays-celebration": "get-birthdays-celebration <days>",
     "delete-birthday": "delete-birthday <name>",
     "set-address": "set-address <name> <address>",
     "all-contacts": "all-contacts",

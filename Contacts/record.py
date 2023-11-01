@@ -1,6 +1,6 @@
 import calendar
 from datetime import datetime
-from Contacts.fields import Birthday, Name, Phone, Address, Email
+from Contacts import Birthday, Name, Phone, Address, Email
 
 
 class Record:
@@ -41,11 +41,11 @@ class Record:
             return_string = ["данні відсутні"]
         # end if
 
-        return_string = f"{(str(self.name)):>15}:  {(' | '.join(return_string))}"
+        return_string = f"{(str(self.name)):>15} :  {(' | '.join(return_string))}"
         return return_string
     # end def
 
-    def __repr__(self):
+    def haystack(self):
         name = self.name
         address = self.address or None
         birthday = self.birthday or None
@@ -83,6 +83,8 @@ class Record:
         elif type in ["address", "birthday"]:
             self.__dict__[type] = value
         # end if
+
+        return True
     # end def
 
     def modify_info(self, type, old_value, new_value):
@@ -98,6 +100,8 @@ class Record:
             self.add_info(type, new_value)
             self.delete_info(type, old_value)
         # end if
+
+        return True
     # end def
 
     def delete_info(self, type, value):
@@ -112,60 +116,52 @@ class Record:
             except:
                 raise KeyError(f"{(self.fields[type])} не знайдено")
             # end try
-        elif type == "address":
+        elif type in ["address", "birthday"]:
             del self.__dict__[type]
         # end if
+
+        return True
     # end def
 
     def add_phone(self, phone):
         self.add_info("phones", Phone(phone))
-
         return self
     # end def
 
     def change_phone(self, old_phone, new_phone):
         self.modify_info("phones", old_phone, Phone(new_phone))
-
         return self
     # end def
 
     def clear_phone(self, phone):
-        try:
-            self.delete_info("phones", phone)
-        finally:
-            return self
-        # end try
+        self.delete_info("phones", phone)
+        return self
     # end def
 
     def add_mail(self, email):
         self.add_info("emails", Email(email))
-
         return self
     # end def
 
     def change_mail(self, old_email, new_email):
         self.modify_info("emails", old_email, Email(new_email))
-
         return self
     # end def
 
     def clear_mail(self, email):
-        try:
-            self.delete_info("emails", email)
-        finally:
-            return self
-        # end try
-    # end def
-
-    def set_address(self, address):
-        self.add_info("address", str(Address(address)))
-
+        self.delete_info("emails", email)
         return self
     # end def
 
-    def set_birthday(self, birthday):
-        self.add_info("birthday", str(Birthday(birthday)))
+    def set_address(self, address):
+        self.add_info("address", Address(address))
+        return self
+    # end def
 
+    def set_birthday(self, birthday=None):
+        if birthday == None:
+            self.delete_info("birthday")
+        self.add_info("birthday", Birthday(birthday))
         return self
     # end def
 
@@ -191,39 +187,3 @@ class Record:
         ).date()
     # end def
 # end class
-
-    # def __init__(self, name):
-    #     self.birthday = None
-    #     self.name = Name(name)
-    #     self.phones = []
-
-    # def add_phone(self, phone):
-    #     self.phones.append(Phone(phone))
-
-    # def change_phone(self, old_phone, new_phone):
-    #     pass
-
-    # def clear_phone(self, phone):
-    #     pass
-
-    # def add_mail(self, mail):
-    #     pass
-
-    # def change_mail(self, old_mail, new_mail):
-    #     pass
-
-    # def clear_mail(self, phone):
-    #     pass
-
-    # def set_birthday(self, birthday):
-    #     self.birthday = Birthday(birthday)
-
-    # def set_address(self, address):
-    #     pass
-
-    # def __rep__():
-    #     pass
-
-    # def __str__(self):
-    #     phones_str = '; '.join(str(p) for p in self.phones)
-    #     return f"Contact name: {self.name}, birthday: {self.birthday}, phones: {phones_str}"
