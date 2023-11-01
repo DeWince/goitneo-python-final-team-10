@@ -41,7 +41,7 @@ class Record:
             return_string = ["данні відсутні"]
         # end if
 
-        return_string = f"{(str(self.name)):>15}:  {(' | '.join(return_string))}"
+        return_string = f"{(str(self.name)):>15} :  {(' | '.join(return_string))}"
         return return_string
     # end def
 
@@ -116,7 +116,7 @@ class Record:
             except:
                 raise KeyError(f"{(self.fields[type])} не знайдено")
             # end try
-        elif type == "address":
+        elif type in ["address", "birthday"]:
             del self.__dict__[type]
         # end if
 
@@ -125,57 +125,43 @@ class Record:
 
     def add_phone(self, phone):
         self.add_info("phones", Phone(phone))
-
         return self
     # end def
 
     def change_phone(self, old_phone, new_phone):
         self.modify_info("phones", old_phone, Phone(new_phone))
-
         return self
     # end def
 
     def clear_phone(self, phone):
-        try:
-            self.delete_info("phones", phone)
-        finally:
-            return self
-        # end try
-
+        self.delete_info("phones", phone)
         return self
     # end def
 
     def add_mail(self, email):
         self.add_info("emails", Email(email))
-
         return self
     # end def
 
     def change_mail(self, old_email, new_email):
         self.modify_info("emails", old_email, Email(new_email))
-
         return self
     # end def
 
     def clear_mail(self, email):
-        try:
-            self.delete_info("emails", email)
-        finally:
-            return self
-        # end try
-
+        self.delete_info("emails", email)
         return self
     # end def
 
     def set_address(self, address):
-        self.add_info("address", str(Address(address)))
-
+        self.add_info("address", Address(address))
         return self
     # end def
 
-    def set_birthday(self, birthday):
-        self.add_info("birthday", str(Birthday(birthday)))
-
+    def set_birthday(self, birthday=None):
+        if birthday == None:
+            self.delete_info("birthday")
+        self.add_info("birthday", Birthday(birthday))
         return self
     # end def
 
