@@ -1,7 +1,7 @@
 import pickle
 from os.path import exists
-from Contacts.contacts import Contacts
-from Notes.notes import Notes
+from Contacts import Contacts
+from Notes import Notes
 
 CONTACTS_FILENAME = "Contacts.pkl"
 NOTES_FILENAME = "Notes.pkl"
