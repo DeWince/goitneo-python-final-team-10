@@ -1,23 +1,25 @@
 from collections import UserDict
 from datetime import datetime
 from Contacts.record import Record
-from Writers.FileWriter import FileWriter
+# from Writers.FileWriter import FileWriter
 
 
 class Contacts(UserDict):
     def __init__(self, **kwargs):
         filename = kwargs.get("filename")
         self.data = UserDict()
-        self.database_connector = FileWriter(filename)
-        self.load()
+        # self.database_connector = FileWriter(filename)
+        # self.load()
     # end def
 
     def save(self):
-        self.database_connector.save(self.data)
+        # self.database_connector.save(self.data)
+        pass
     # end def
 
     def load(self):
-        self.data = UserDict(self.database_connector.load())
+        # self.data = UserDict(self.database_connector.load())
+        pass
     # end def
 
     def add_record(self, record: Record):
