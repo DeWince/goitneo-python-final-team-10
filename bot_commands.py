@@ -148,17 +148,6 @@ def set_birthday(contacts, args):
     record.set_birthday(birthday)
     return "Birthday changed."
 
-
-@input_error
-def get_birthday(contacts, args):
-    try:
-        name = args[0]
-    except IndexError:
-        raise FormatError("Please provide a name!")
-    record = contacts.get_record(name)
-    return str(record.birthday)
-
-
 @input_error
 def get_birthdays_celebration(contacts, *args):
     days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
@@ -266,11 +255,10 @@ CONTACTS_COMMANDS = {
     "change-email": change_email,
     "delete-email": delete_email,
     "delete-all-emails": delete_all_email,
-    "set-birthday": set_birthday,
-    "get-birthday": get_birthday,
+    "add-birthday": set_birthday,
     "get-birthdays-celebration": get_birthdays_celebration,
     "delete-birthday": delete_birthday,
-    "set-address": set_address,
+    "add-address": set_address,
     "all-contacts": get_all_contacts
 }
 
@@ -297,11 +285,10 @@ COMMANDS_SYNTAX = {
     "change-email": "change-email <name> <old_email> <new_email>",
     "delete-email": "delete-email <name> <email>",
     "delete-all-emails": "delete-all-email <name>",
-    "set-birthday": "set-birthday <name> <birthday>",
-    "get-birthday": "get-birthday <name>",
+    "add-birthday": "add-birthday <name> <birthday>",
     "get-birthdays-celebration": "get-birthdays-celebration <days>",
     "delete-birthday": "delete-birthday <name>",
-    "set-address": "set-address <name> <address>",
+    "add-address": "add-address <name> <address>",
     "all-contacts": "all-contacts",
     "add-note": "add-note <text>",
     "find-note": "find-note <title>",
