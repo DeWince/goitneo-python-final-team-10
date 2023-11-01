@@ -1,5 +1,6 @@
 from Contacts.record import Record
-from Errors.error_handlers import address_args_error, birth_args_error, contacts_search_args_error, email_args_error, input_error, note_search_args_error, phone_args_error
+from Errors.error_handlers import address_args_error, birth_args_error, contacts_search_args_error, email_args_error, \
+    input_error, note_search_args_error, phone_args_error, FormatError, note_args_error
 from Notes.note import Note
 
 
@@ -12,7 +13,10 @@ def parse_input(user_input):
 
 @input_error
 def add_contact(contacts, args):
-    name = args[0]
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
     contacts.add_record(Record(name))
     return "Contact added."
 
@@ -20,37 +24,40 @@ def add_contact(contacts, args):
 @contacts_search_args_error
 @input_error
 def find_contact(contacts, args):
-    search_by = args[0]
-    records = []
-    for name, record in contacts.values():
-        if search_by in name:
-            records.append(record)
-        elif search_by in record.address.value:
-            record.append(record)
-        elif search_by in record.email.value:
-            record.append(record)
-        else:
-            records += list(filter(lambda x: search_by in x.value, record.phones))
-
-    if records:
-        return "Search results:'n" + "\n".join(records)
-    return f"Contact with attribute {search_by} not found!"
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
+    return (
+        "Search result:\n" +
+        "\n".join(str(record) for record in contacts.find_record(name))
+    )
 
 
 @input_error
 def delete_contact(contacts, args):
-    name = args[0]
-    return contacts.delete(name)
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
+    return "Contact deleted:\n" + str(contacts.delete_record(name))
 
 
 @phone_args_error
 @input_error
 def add_phone(contacts, args):
     name, *phones = args
+    if not phones:
+        raise ValueError
     record = contacts.get_record(name)
+    results = []
     for phone in phones:
-        record.add_phone(phone)
-    return "Phones added."
+        try:
+            record.add_phone(phone)
+            results.append(f"Phone {phone} added.")
+        except FormatError as e:
+            results.append(f"Phone {phone} format is invalid.")
+    return "\n".join(results)
 
 
 @phone_args_error
@@ -67,16 +74,19 @@ def change_phone(contacts, args):
 def delete_phone(contacts, args):
     name, phone = args
     record = contacts.get_record(name)
-    record.delete_phone(phone)
+    record.clear_phone(phone)
     return "Phones deleted."
 
 
 @phone_args_error
 @input_error
 def delete_all_phone(contacts, args):
-    name = args[0]
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.phones = None
+    record.phones = set()
     return "All phones deleted."
 
 
@@ -85,7 +95,7 @@ def delete_all_phone(contacts, args):
 def add_email(contacts, args):
     name, email = args
     record = contacts.get_record(name)
-    record.add_email(email)
+    record.add_mail(email)
     return "Emails added."
 
 
@@ -94,7 +104,7 @@ def add_email(contacts, args):
 def change_email(contacts, args):
     name, old_email, new_email = args
     record = contacts.get_record(name)
-    record.change_phone(old_email, new_email)
+    record.change_mail(old_email, new_email)
     return "Email changed."
 
 
@@ -103,16 +113,19 @@ def change_email(contacts, args):
 def delete_email(contacts, args):
     name, email = args
     record = contacts.get_record(name)
-    record.delete_email(email)
+    record.clear_mail(email)
     return "Emails deleted."
 
 
 @email_args_error
 @input_error
 def delete_all_email(contacts, args):
-    name = args[0]
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.email = None
+    record.emails = set()
     return "All emails deleted."
 
 
@@ -121,21 +134,36 @@ def delete_all_email(contacts, args):
 def set_birthday(contacts, args):
     name, birthday = args
     record = contacts.get_record(name)
-    record.add_birthday(birthday)
+    record.set_birthday(birthday)
     return "Birthday changed."
 
 
 @input_error
-def get_birthdays(contacts, *args):
-    records = contacts.get_birthdays()
+def get_birthday(contacts, args):
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
+    record = contacts.get_record(name)
+    return str(record.birthday)
+
+
+@input_error
+def get_birthdays_celebration(contacts, *args):
+    days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
+    records = contacts.get_birthdays(days)
     if len(records) <= 0:
-        return "No birthdays next week"
-    return "Birthdays next week:\n" + "\n".join(map(str, records))
+        return f"No birthdays next {days} day"
+    return (f"Birthdays in next {days} days:\n" +
+            "\n".join(map(str, records)))
 
 
 @input_error
 def delete_birthday(contacts, args):
-    name = args[0]
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
     record.birthday = None
     return "Birthday deleted."
@@ -156,43 +184,54 @@ def get_all_contacts(contacts, *args):
     return "\n".join(str(record) for record in contacts.values())
 
 
+@note_args_error
 @input_error
 def add_note(notes, args):
-    note_text = args[0]
-    notes.add_note(
-        Note(
-            title=note_text[:10] if len(note_text) > 10 else note_text,
-            text=note_text
-        )
-    )
+    try:
+        user_text = " ".join(args)
+        if "|" in user_text:
+            title, text = user_text.split("|")
+        else:
+            title = user_text[:10] if len(user_text) > 10 else user_text
+            text = user_text
+    except IndexError:
+        raise FormatError("Please provide note title!")
+    notes.add_note(title, text)
     return "Note added."
 
 
 @note_search_args_error
 @input_error
 def find_note(notes, args):
-    search_by = args[0]
-    return notes.find_record(search_by)
+    try:
+        search_by = args[0]
+    except IndexError:
+        raise FormatError("Please provide search query!")
+    return notes.find(search_by)
 
 
 @note_search_args_error
 @input_error
 def edit_note(notes, args):
-    title, new_text = args
+    title, new_text = " ".join(args).split("-")
     notes.edit_note(title, new_text)
     return "Note edited."
 
 
+@note_search_args_error
 @input_error
 def delete_note(notes, args):
-    title = args[0]
+    try:
+        title = " ".join(args)
+    except IndexError:
+        raise FormatError("Please provide note title!")
     notes.delete(title)
     return "Note deleted."
 
 
 @input_error
 def delete_all_note(notes, args):
-    notes.__dict__ = None
+    notes.data = {}
     return "All notes deleted."
 
 
@@ -210,13 +249,14 @@ CONTACTS_COMMANDS = {
     "add-phone": add_phone,
     "change-phone": change_phone,
     "delete-phone": delete_phone,
-    "delete-all-phone": delete_all_phone,
+    "delete-all-phones": delete_all_phone,
     "add-email": add_email,
     "change-email": change_email,
     "delete-email": delete_email,
-    "delete-all-email": delete_all_email,
+    "delete-all-emails": delete_all_email,
     "set-birthday": set_birthday,
-    "get-birthday": get_birthdays,
+    "get-birthday": get_birthday,
+    "get-birthdays-celebration": get_birthdays_celebration,
     "delete-birthday": delete_birthday,
     "set-address": set_address,
     "all-contacts": get_all_contacts
@@ -228,7 +268,7 @@ NOTES_COMMANDS = {
     "find-note": find_note,
     "edit-note": edit_note,
     "delete-note": delete_note,
-    "delete-all-note": delete_all_note,
+    "delete-all-notes": delete_all_note,
     "all-notes": get_all_notes
 }
 
@@ -240,20 +280,21 @@ COMMANDS_SYNTAX = {
     "add-phone": "add-phone <name> <phones>",
     "change-phone": "change-phone <name> <old_phone> <new_phone>",
     "delete-phone": "delete-phone <name> <phone>",
-    "delete-all-phone": "delete-all-phone <name>",
+    "delete-all-phones": "delete-all-phone <name>",
     "add-email": "add-email <name> <email>",
     "change-email": "change-email <name> <old_email> <new_email>",
     "delete-email": "delete-email <name> <email>",
-    "delete-all-email": "delete-all-email <name>",
+    "delete-all-emails": "delete-all-email <name>",
     "set-birthday": "set-birthday <name> <birthday>",
-    "get-birthday": "get-birthdays <name>",
+    "get-birthday": "get-birthday <name>",
+    "get-birthdays-celebration": "get-birthdays-celebration",
     "delete-birthday": "delete-birthday <name>",
     "set-address": "set-address <name> <address>",
     "all-contacts": "all-contacts",
     "add-note": "add-note <text>",
     "find-note": "find-note <title>",
-    "edit-note": "edit-note <title> <new-text>",
+    "edit-note": "edit-note <title> - <new-text>",
     "delete-note": "delete-note <title>",
-    "delete-all-note": "delete-all-note",
+    "delete-all-notes": "delete-all-note",
     "all-notes": "all-notes"
 }
