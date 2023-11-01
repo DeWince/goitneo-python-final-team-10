@@ -30,6 +30,8 @@ class Address(Field):
 
 
 class Birthday(Validatable):
+    date_format = "%d.%m.%Y"
+    
     def __init__(self, value):
         self.regex = r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}"
         if not super().is_valid_type(value, self.regex):
@@ -37,13 +39,31 @@ class Birthday(Validatable):
         date = re.search(r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}", value)
         date_formated = re.sub(r"[-,:/]", '.', date.group())
         try:
-            datetime.strptime(date_formated, "%d.%m.%Y")
+            self.to_datetime(date_formated)
             super().__init__(date_formated)
         except:
             FormatError("Not correct date")
 
-    def to_datetime(self):
-        return datetime.strptime(self.value, '%d.%m.%Y')
+    @classmethod
+    def to_datetime(cls, value):
+        return datetime.strptime(value, cls.date_format)
+
+
+# class Birthday(Validatable):
+#     def __init__(self, value):
+#         self.regex = r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}"
+#         if not super().is_valid_type(value, self.regex):
+#             raise FormatError("Not correct date")
+#         date = re.search(r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}", value)
+#         date_formated = re.sub(r"[-,:/]", '.', date.group())
+#         try:
+#             datetime.strptime(date_formated, "%d.%m.%Y")
+#             super().__init__(date_formated)
+#         except:
+#             FormatError("Not correct date")
+
+#     def to_datetime(self):
+#         return datetime.strptime(self.value, '%d.%m.%Y')
 
 
 class Phone(Validatable):
