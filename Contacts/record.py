@@ -7,8 +7,8 @@ class Record:
     fields = {
         "name": "Name",
         "address": "Address",
-        "emails": "E-mail",
-        "phones": "Phone",
+        "emails": "E-mails",
+        "phones": "Phones",
         "birthday": "Birthday"
     }
     sets = ["phones", "emails"]
@@ -89,9 +89,12 @@ class Record:
 
         return True
 
-    def delete_info(self, type, value):
+    def delete_info(self, type, value=None):
         value = str(value)
         if type in self.sets:
+            if value == None:
+                raise ValueError("Provide a value to delete")
+
             try:
                 if value == "all":
                     self.__dict__[type] = set()
@@ -100,7 +103,7 @@ class Record:
             except:
                 raise KeyError(f"{(self.fields[type])} not found")
         elif type in ["address", "birthday"]:
-            del self.__dict__[type]
+            self.__dict__[type] = None
 
         return True
 
@@ -135,7 +138,8 @@ class Record:
     def set_birthday(self, birthday=None):
         if birthday == None:
             self.delete_info("birthday")
-        self.add_info("birthday", Birthday(birthday))
+        else:
+            self.add_info("birthday", Birthday(birthday))
         return self
 
     def get_celebrate_date(self, celebrate_year=None):
@@ -144,11 +148,10 @@ class Record:
         if celebrate_year == None:
             celebrate_year = datetime.now().year
 
-        is_leap = calendar.isleap(celebrate_year)
-        bday = datetime.strptime(self.birthday, "%d.%m.%Y")
+        bday = Birthday.to_datetime(self.birthday)
         month = bday.month
         day = bday.day
-        if (month == 2 and day == 29 and not is_leap):
+        if (month == 2 and day == 29 and not calendar.isleap(celebrate_year)):
             day = 28
 
         return datetime(
