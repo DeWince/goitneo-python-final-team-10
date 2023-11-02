@@ -176,6 +176,17 @@ def set_address(contacts, args):
     return f"Address changed.\n{record}"
 
 
+@input_error
+def delete_address(contacts, args):
+    try:
+        name = args[0]
+    except IndexError:
+        raise FormatError("Please provide a name!")
+    record = contacts.get_record(name)
+    record.set_address()    # changed method
+    return f"Birthday deleted.\n{record}"
+
+
 def get_all_contacts(contacts, *args):
     if not contacts.values():
         return "No contacts yet, please use 'add-contact' command to begin"
@@ -193,8 +204,8 @@ def add_note(notes, args):
             title = user_text[:10] if len(user_text) > 10 else user_text
             text = user_text
     except IndexError:
-        raise FormatError("Please provide a note title!")
-    notes.add_note(title, text)
+        raise FormatError("Please provide note title!")
+    notes.add_note(title.strip(), text.strip())
     return "Note added."
 
 
@@ -211,8 +222,13 @@ def find_note(notes, args):
 @note_search_args_error
 @input_error
 def edit_note(notes, args):
-    title, new_text = " ".join(args).split("-")
-    notes.edit_note(title, new_text)
+    try:
+        old_title, new_title, new_text = " ".join(args).split("|")
+    except ValueError:
+        raise FormatError(
+            "Invalid input!\n Edit note syntax: edit-note "
+            "<old title> | <new title> | <new note>")
+    notes.edit_note(old_title, new_title, new_text)
     return "Note edited."
 
 
@@ -256,6 +272,7 @@ CONTACTS_COMMANDS = {
     "get-birthdays-celebration": get_birthdays_celebration,
     "delete-birthday": delete_birthday,
     "add-address": set_address,
+    "delete-address": delete_address,
     "all-contacts": get_all_contacts
 }
 
@@ -286,10 +303,11 @@ COMMANDS_SYNTAX = {
     "get-birthdays-celebration": "get-birthdays-celebration <days>",
     "delete-birthday": "delete-birthday <name>",
     "add-address": "add-address <name> <address>",
+    "delete-address": "delete-address <name>",
     "all-contacts": "all-contacts",
-    "add-note": "add-note <text>",
+    "add-note": "add-note <title> | <note>",
     "find-note": "find-note <title>",
-    "edit-note": "edit-note <title> - <new-text>",
+    "edit-note": "edit-note <old title> | <new title> | <new note>",
     "delete-note": "delete-note <title>",
     "delete-all-notes": "delete-all-note",
     "all-notes": "all-notes"
