@@ -174,76 +174,76 @@ def get_all_contacts(contacts, *args):
 
 @input_error
 def add_note(notes, args):
-    args = " ".join(args)  # преобразуем args обратно в строку
-
-    # если есть разделитель
-    if " | " in args:
-        title, text = args.split(" | ", 1)
-    else:
-        title = args[:10]
-        text = args
-
-    notes.add_note(title, text)
-    return "Note added."
+    note_input = " ".join(args)
+    notes.add_note(note_input)
+    return "Note added"
 
 
 @note_search_args_error
 @input_error
 def find_note(notes, args):
-    search_by = args[0]
-    return notes.find(search_by)
+    if len(args):
+        return notes.find(args[0])
+    raise ValueError("Enter search string")
+
 
 @note_search_args_error
 @input_error
 def edit_note(notes, args):
-    title, new_text = args
-    notes.edit_note(title, new_text)
-    return "Note edited."
+    if len(args < 2):
+        raise ValueError("Incorrect number of arguments")
+    idx, new_text = args
+    notes.edit_note(idx, new_text)
+    return "Note changed"
 
 
 @input_error
 def delete_note(notes, args):
-    title = args[0]
-    notes.delete(title)
-    return "Note deleted."
+    if len(args) == 0:
+        raise ValueError("Enter note number")
+    notes.delete(args[0])
+    return "Note deleted"
 
 
 @input_error
-def delete_all_note(notes, args):
-    notes.__dict__ = None
-    return "All notes deleted."
+def delete_all_note(notes, *_):
+    notes.__dict__ = dict()
+    return "All notes deleted"
 
 
 @input_error
-def get_all_notes(notes, *args):
+def get_all_notes(notes, *_):
     if not notes.values():
-        return "No notes yet, please use 'add' command to add them"
+        return "No notes yet, please use 'add-note' to start"
     return "\n------\n".join(str(note) for note in notes.values())
+
 
 @input_error
 def add_tag(notes, args):
-    title, tag = args
-    note = notes.get_note_by_title(title)
+    if len(args) < 2:
+        raise ValueError("Incorrect number of arguments")
+    idx, tag, *_ = args
+    note = notes.get_note_by_number(idx)
 
-    if note is not None:
-        notes.add_tag(title, tag)
-        return f"Tag {tag} added to note {title}."
-    else:
-        return f"Note with title {title} not found."
+    notes.add_tag(idx, tag)
+    return f"Tag {tag} added to note {note.title if note.title else ('#' + note.number)}"
 
 
 @input_error
 def remove_tag(notes, args):
-    title, tag = args
-    note = notes.get_note_by_title(title)
-    if not note:
-        return f"Note with title {title} not found."
-    notes.remove_tag(title, tag)
-    return f"Tag {tag} removed from note {title}."
+    if len(args) < 2:
+        raise ValueError("Incorrect number of arguments")
+    idx, tag, *_ = args
+    note = notes.get_note_by_number(idx)
+
+    notes.remove_tag(idx, tag)
+    return f"Tag {tag} removed from note {note.title if note.title else ('#' + note.number)}"
+
 
 @input_error
-def sort_notes_by_tags_command(notes, args):
+def sort_notes_by_tags_command(notes, *_):
     return notes.sort_notes_by_tags()
+
 
 @input_error
 def find_by_tag_command(notes, args):
@@ -252,8 +252,7 @@ def find_by_tag_command(notes, args):
     if found_notes:
         return found_notes
     else:
-        return f"No notes found with tag {tag}."
-
+        return f"No notes found with tag {tag}"
 
 
 CONTACTS_COMMANDS = {
