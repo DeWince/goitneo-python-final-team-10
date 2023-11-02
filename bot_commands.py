@@ -148,10 +148,13 @@ def set_birthday(contacts, args):
     record.set_birthday(birthday)
     return "Birthday changed."
 
+
 @input_error
 def get_birthdays_celebration(contacts, *args):
     days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
     end_text = f"in next {days} days" if days > 1 else "tomorrow"
+    if days < 1:
+        return "Please enter valid number of days!"
     birthdays = contacts.get_birthdays(days)
     if len(birthdays) <= 0:
         return f"No birthdays {end_text}"
