@@ -177,6 +177,8 @@ def delete_birthday(contacts, args):
 @input_error
 def set_address(contacts, args):
     name, *address = args   # allow address to contain spaces
+    if not address:
+        return "Address missing!"
     record = contacts.get_record(name)
     record.set_address(" ".join(address))  # return spaces
     return f"Address changed.\n{record}"
