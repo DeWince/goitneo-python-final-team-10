@@ -1,20 +1,27 @@
 import re
-import random
 
 
 class Note:
-    note_id = 0
+    max_note_id = None
 
     def __init__(self, text):
         if len(text) == 0:
             raise ValueError("Note requires a body")
-
-        self.number = self.note_id
-        self.note_id += 1
+        Note.max_note_id += 1
+        self.number = Note.max_note_id
         self.title, self.text, self.tags = self.separate_tags(text)
 
     def __str__(self):
-        return f"#{self.number}{(' - ' + self.title) if self.title else ''}  [Tags: {', '.join(self.tags)}]\n# - {self.text}"
+        msg = ""
+        if self.title:
+            msg += f" - {self.title}"
+        if self.tags:
+            msg += f"   [Tags: {', '.join(self.tags)}]"
+        if len(msg):
+            msg += "\n       "
+        else:
+            msg = "   "
+        return f"#{self.number:<3}{msg}{self.text}"
 
     def __repr__(self):
         return f"{self.number}|{self.title}|{self.text}|{self.tags}"

@@ -190,16 +190,17 @@ def find_note(notes, args):
 @note_search_args_error
 @input_error
 def edit_note(notes, args):
-    if len(args < 2):
+    if len(args) < 2:
         raise ValueError("Incorrect number of arguments")
-    idx, new_text = args
-    notes.edit_note(idx, new_text)
+    idx, *new_text = args
+    note_input = " ".join(new_text)
+    notes.edit_note(idx, note_input)
     return "Note changed"
 
 
 @input_error
 def delete_note(notes, args):
-    if len(args) == 0:
+    if len(args) == 0 or not args[0].isdigit():
         raise ValueError("Enter note number")
     notes.delete(args[0])
     return "Note deleted"
@@ -215,7 +216,7 @@ def delete_all_note(notes, *_):
 def get_all_notes(notes, *_):
     if not notes.values():
         return "No notes yet, please use 'add-note' to start"
-    return "\n------\n".join(str(note) for note in notes.values())
+    return notes.print_notes(notes.values())
 
 
 @input_error
@@ -223,7 +224,7 @@ def add_tag(notes, args):
     if len(args) < 2:
         raise ValueError("Incorrect number of arguments")
     idx, tag, *_ = args
-    note = notes.get_note_by_number(idx)
+    note = notes.get_note_by_id(idx)
 
     notes.add_tag(idx, tag)
     return f"Tag {tag} added to note {note.title if note.title else ('#' + note.number)}"
@@ -234,7 +235,7 @@ def remove_tag(notes, args):
     if len(args) < 2:
         raise ValueError("Incorrect number of arguments")
     idx, tag, *_ = args
-    note = notes.get_note_by_number(idx)
+    note = notes.get_note_by_id(idx)
 
     notes.remove_tag(idx, tag)
     return f"Tag {tag} removed from note {note.title if note.title else ('#' + note.number)}"

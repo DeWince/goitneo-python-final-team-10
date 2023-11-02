@@ -1,5 +1,4 @@
 from collections import UserDict
-import pickle
 from Notes.note import Note
 
 
@@ -12,31 +11,38 @@ class Notes(UserDict):
             if search_str.casefold() in repr(note).casefold():
                 matching_notes.append(str(note))
 
-        return "\n------\n".join(matching_notes)
+        return self.print_notes(matching_notes)
 
-    def get_note_by_number(self, idx):
+    def get_note_by_id(self, idx):
+        idx = int(idx)
         note = self.data.get(idx, None)
         if not note:
-            raise KeyError("Note with number '{idx}' not found")
+            raise KeyError(f"Note with number '{idx}' not found")
         return note
 
     def add_note(self, text):
+        if not Note.max_note_id:
+            Note.max_note_id = max([note.number for note in self.values()])
         note = Note(text)
         self.data[note.number] = note
 
     def edit_note(self, idx, new_text):
-        note = self.get_note_by_number(idx)
+        idx = int(idx)
+        note = self.get_note_by_id(idx)
         note.title, note.text, note.tags = note.separate_tags(new_text)
 
     def delete(self, idx):
-        self.find_note_by_number(idx)
+        idx = int(idx)
+        self.get_note_by_id(idx)
         del self.data[idx]
 
     def add_tag(self, idx, tag):
+        idx = int(idx)
         if idx in self.data:
             self.data[idx].tags.add(tag)
 
     def remove_tag(self, idx, tag):
+        idx = int(idx)
         if idx in self.data and tag in self.data[idx].tags:
             self.data[idx].tags.remove(tag)
 
@@ -47,8 +53,11 @@ class Notes(UserDict):
             if tag in note.tags:
                 matching_notes.append(str(note))
 
-        return "\n------\n".join(matching_notes)
+        return self.print_notes(matching_notes)
 
     def sort_notes_by_tags(self):
         sorted_notes = sorted(self.data.values(), key=lambda note: sorted(note.tags)[0] if note.tags else "")
-        return "\n------\n".join(str(note) for note in sorted_notes)
+        return self.print_notes(sorted_notes)
+
+    def print_notes(self, notes):
+        return "\n------\n".join(map(str, notes)) + "\n"
