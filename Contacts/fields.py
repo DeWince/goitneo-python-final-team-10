@@ -31,46 +31,29 @@ class Address(Field):
 
 class Birthday(Validatable):
     date_format = "%d.%m.%Y"
-    
+
     def __init__(self, value):
         self.regex = r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}"
         if not super().is_valid_type(value, self.regex):
-            raise FormatError("Not correct date")
+            raise FormatError("Date is not valid")
         date = re.search(r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}", value)
         date_formated = re.sub(r"[-,:/]", '.', date.group())
         try:
             self.to_datetime(date_formated)
             super().__init__(date_formated)
         except:
-            FormatError("Not correct date")
+            FormatError("Date is not valid")
 
     @classmethod
     def to_datetime(cls, value):
         return datetime.strptime(value, cls.date_format)
 
 
-# class Birthday(Validatable):
-#     def __init__(self, value):
-#         self.regex = r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}"
-#         if not super().is_valid_type(value, self.regex):
-#             raise FormatError("Not correct date")
-#         date = re.search(r"\d{1,2}[-,.:/]\d{1,2}[-,.:/]\d{4}", value)
-#         date_formated = re.sub(r"[-,:/]", '.', date.group())
-#         try:
-#             datetime.strptime(date_formated, "%d.%m.%Y")
-#             super().__init__(date_formated)
-#         except:
-#             FormatError("Not correct date")
-
-#     def to_datetime(self):
-#         return datetime.strptime(self.value, '%d.%m.%Y')
-
-
 class Phone(Validatable):
     def __init__(self, value):
         self.regex = r"\d{10}"
         if not super().is_valid_type(value, self.regex):
-            raise FormatError("Not correct number, should contain 10 digits")
+            raise FormatError("Number should contain only 10 digits")
         super().__init__(value)
 
 
@@ -78,5 +61,5 @@ class Email(Validatable):
     def __init__(self, value):
         self.regex = r"[a-zA-Z]{1}[a-zA-Z0-9_.]+[@]{1}[a-zA-z]+[.][a-zA-z]{1}[a-zA-z]+"
         if not super().is_valid_type(value, self.regex):
-            raise FormatError("Not correct e-mail address")
+            raise FormatError("Email is not valid")
         super().__init__(value)
