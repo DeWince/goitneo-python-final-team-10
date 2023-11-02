@@ -174,13 +174,16 @@ def get_all_contacts(contacts, *args):
 
 @input_error
 def add_note(notes, args):
-    note_text = args[0]
-    notes.add_note(
-        Note(
-            title=note_text[:10] if len(note_text) > 10 else note_text,
-            text=note_text
-        )
-    )
+    args = " ".join(args)  # преобразуем args обратно в строку
+
+    # если есть разделитель
+    if " | " in args:
+        title, text = args.split(" | ", 1)
+    else:
+        title = args[:10]
+        text = args
+
+    notes.add_note(title, text)
     return "Note added."
 
 
@@ -215,7 +218,42 @@ def delete_all_note(notes, args):
 def get_all_notes(notes, *args):
     if not notes.values():
         return "No notes yet, please use 'add' command to add them"
-    return "\n".join(str(note) for note in notes.values())
+    return "\n------\n".join(str(note) for note in notes.values())
+
+@input_error
+def add_tag(notes, args):
+    title, tag = args
+    note = notes.get_note_by_title(title)
+
+    if note is not None:
+        notes.add_tag(title, tag)
+        return f"Tag {tag} added to note {title}."
+    else:
+        return f"Note with title {title} not found."
+
+
+@input_error
+def remove_tag(notes, args):
+    title, tag = args
+    note = notes.get_note_by_title(title)
+    if not note:
+        return f"Note with title {title} not found."
+    notes.remove_tag(title, tag)
+    return f"Tag {tag} removed from note {title}."
+
+@input_error
+def sort_notes_by_tags_command(notes, args):
+    return notes.sort_notes_by_tags()
+
+@input_error
+def find_by_tag_command(notes, args):
+    tag = args[0]
+    found_notes = notes.find_by_tag(tag)
+    if found_notes:
+        return found_notes
+    else:
+        return f"No notes found with tag {tag}."
+
 
 
 CONTACTS_COMMANDS = {
@@ -244,7 +282,11 @@ NOTES_COMMANDS = {
     "edit-note": edit_note,
     "delete-note": delete_note,
     "delete-all-note": delete_all_note,
-    "all-notes": get_all_notes
+    "all-notes": get_all_notes,
+    "add-tag": add_tag,
+    "remove-tag": remove_tag,
+    'find-tag': find_by_tag_command,
+    'sort-tags': sort_notes_by_tags_command,
 }
 
 
@@ -270,5 +312,9 @@ COMMANDS_SYNTAX = {
     "edit-note": "edit-note <title> <new-text>",
     "delete-note": "delete-note <title>",
     "delete-all-note": "delete-all-note",
-    "all-notes": "all-notes"
+    "all-notes": "all-notes",
+    "add-tag": "add-tag <title> <tag>",
+    "remove-tag": "remove-tag <title> <tag>",
+    "find-tag": "find-tag <tag>",
+    "sort-tags": "sort-tags"
 }
