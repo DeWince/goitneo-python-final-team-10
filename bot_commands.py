@@ -42,7 +42,6 @@ def find_contact(contacts, args):
     )
 
 
-
 @input_error
 def delete_contact(contacts, args):
     try:
@@ -50,7 +49,6 @@ def delete_contact(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     return "Contact deleted:\n" + str(contacts.delete_record(name))
-
 
 
 @phone_args_error
@@ -70,14 +68,13 @@ def add_phone(contacts, args):
     return "\n".join(results)
 
 
-
 @phone_args_error
 @input_error
 def change_phone(contacts, args):
     name, old_phone, new_phone = args
     record = contacts.get_record(name)
     record.change_phone(old_phone, new_phone)
-    return f"Phone changed.\n{record}"    # removed 's'
+    return f"Phone changed.\n{record}"
 
 
 @phone_args_error
@@ -85,8 +82,8 @@ def change_phone(contacts, args):
 def delete_phone(contacts, args):
     name, phone = args
     record = contacts.get_record(name)
-    record.clear_phone(phone)   # changed method
-    return f"Phone deleted.\n{record}"    # removed 's'
+    record.clear_phone(phone)
+    return f"Phone deleted.\n{record}"
 
 
 @phone_args_error
@@ -97,7 +94,7 @@ def delete_all_phone(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.clear_phone("all")    # changed method
+    record.clear_phone("all")
     return f"All phones deleted.\n{record}"
 
 
@@ -148,13 +145,14 @@ def set_birthday(contacts, args):
     record.set_birthday(birthday)
     return "Birthday changed."
 
+
 @input_error
 def get_birthdays_celebration(contacts, *args):
     days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
     birthdays = contacts.get_birthdays(days)
     if len(birthdays) <= 0:
-        return f"No birthdays next {days} day"
-    return (f"Birthdays in next {days} days:\n" +
+        return f"No birthdays next {days} day{'s' if days > 1 else ''}"
+    return (f"Birthday{'s' if len(birthdays) > 1 else ''} in next {days} day{'s' if days > 1 else ''}:\n" +
             "\n".join(map(str, birthdays)))
 
 
@@ -165,22 +163,22 @@ def delete_birthday(contacts, args):
     except IndexError:
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
-    record.set_birthday()    # changed method
+    record.set_birthday()
     return f"Birthday deleted.\n{record}"
 
 
 @address_args_error
 @input_error
 def set_address(contacts, args):
-    name, *address = args   # allow address to contain spaces
+    name, *address = args
     record = contacts.get_record(name)
-    record.set_address(" ".join(address))  # return spaces
+    record.set_address(" ".join(address))
     return f"Address changed.\n{record}"
 
 
 def get_all_contacts(contacts, *args):
     if not contacts.values():
-        return "No contacts yet, please use 'add' command to add them"
+        return "No contacts yet, please use 'add-contact' command to begin"
     return "\n".join(str(record) for record in contacts.values())
 
 
@@ -195,7 +193,7 @@ def add_note(notes, args):
             title = user_text[:10] if len(user_text) > 10 else user_text
             text = user_text
     except IndexError:
-        raise FormatError("Please provide note title!")
+        raise FormatError("Please provide a note title!")
     notes.add_note(title, text)
     return "Note added."
 
@@ -206,9 +204,8 @@ def find_note(notes, args):
     try:
         search_by = args[0]
     except IndexError:
-        raise FormatError("Please provide search query!")
+        raise FormatError("Please provide a search query!")
     return notes.find(search_by)
-
 
 
 @note_search_args_error
@@ -225,7 +222,7 @@ def delete_note(notes, args):
     try:
         title = " ".join(args)
     except IndexError:
-        raise FormatError("Please provide note title!")
+        raise FormatError("Please provide a note title!")
     notes.delete(title)
     return "Note deleted."
 
@@ -239,7 +236,7 @@ def delete_all_note(notes, args):
 @input_error
 def get_all_notes(notes, *args):
     if not notes.values():
-        return "No notes yet, please use 'add' command to add them"
+        return "No notes yet, please use 'add-note' command to start"
     return "\n".join(str(note) for note in notes.values())
 
 
