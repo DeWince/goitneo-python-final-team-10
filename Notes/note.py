@@ -18,7 +18,8 @@ class Note:
         if self.tags:
             msg += f"   [Tags: {', '.join(self.tags)}]"
         if len(msg):
-            msg += "\n       "
+            if len(self.text):
+                msg += "\n       "
         else:
             msg = "   "
         return f"#{self.number:<3}{msg}{self.text}"

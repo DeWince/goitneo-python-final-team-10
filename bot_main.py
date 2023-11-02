@@ -13,17 +13,24 @@ from bot_commands import (
 def main():
     contacts, notes = read_from_file()
 
+    def exit_bot():
+        print("\nGood bye!")
+        write_to_file(contacts, notes)
+        exit()
+
     print("Welcome to the assistant bot!")
     while True:
-        user_input = input("Enter a command: ")
+        try:
+            user_input = input("Enter a command: ")
+        except KeyboardInterrupt:
+            exit_bot()
+
         command = ""
         args = []
         if user_input:
             command, *args = parse_input(user_input)
         if command in ["close", "exit", "quit"]:
-            print("Good bye!")
-            write_to_file(contacts, notes)
-            break
+            exit_bot()
         elif command == "hello":
             print("How can I help you?")
         elif command == "help":

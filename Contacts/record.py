@@ -131,8 +131,11 @@ class Record:
         self.delete_info("emails", email)
         return self
 
-    def set_address(self, address):
-        self.add_info("address", Address(address))
+    def set_address(self, address=None):
+        if address == None:
+            self.delete_info("address")
+        else:
+            self.add_info("address", Address(address))
         return self
 
     def set_birthday(self, birthday=None):

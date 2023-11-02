@@ -56,7 +56,7 @@ def delete_contact(contacts, args):
 def add_phone(contacts, args):
     name, *phones = args
     if not phones:
-        raise ValueError
+        raise IndexError
     record = contacts.get_record(name)
     results = []
     for phone in phones:
@@ -200,6 +200,8 @@ def get_all_contacts(contacts, *_):
 @note_args_error
 @input_error
 def add_note(notes, args):
+    if len(args) == 0:
+        raise IndexError("Note must contain something")
     note_input = " ".join(args)
     notes.add_note(note_input)
     return "Note added"
@@ -210,14 +212,14 @@ def add_note(notes, args):
 def find_note(notes, args):
     if len(args):
         return notes.find(args[0])
-    raise ValueError("Enter search string")
+    raise IndexError("Enter search string")
 
 
 @note_search_args_error
 @input_error
 def edit_note(notes, args):
     if len(args) < 2:
-        raise ValueError("Incorrect number of arguments")
+        raise IndexError("Incorrect number of arguments")
     idx, *new_text = args
     note_input = " ".join(new_text)
     notes.edit_note(idx, note_input)
@@ -228,14 +230,14 @@ def edit_note(notes, args):
 @input_error
 def delete_note(notes, args):
     if len(args) == 0 or not args[0].isdigit():
-        raise ValueError("Enter note number")
+        raise IndexError("Enter note number")
     notes.delete(args[0])
     return "Note deleted"
 
 
 @input_error
 def delete_all_notes(notes, *_):
-    notes.__dict__ = dict()
+    notes.delete()
     return "All notes deleted"
 
 
@@ -249,23 +251,38 @@ def get_all_notes(notes, *_):
 @input_error
 def add_tag(notes, args):
     if len(args) < 2:
-        raise ValueError("Incorrect number of arguments")
+        raise IndexError("Incorrect number of arguments")
     idx, tag, *_ = args
+    if tag[0:1] != "#":
+        tag = f"#{tag}"
     note = notes.get_note_by_id(idx)
 
     notes.add_tag(idx, tag)
-    return f"Tag {tag} added to note {note.title if note.title else ('#' + note.number)}"
+    return f"Tag {tag} added to note {note.title if note.title else ('#' + str(note.number))}"
 
 
 @input_error
 def remove_tag(notes, args):
     if len(args) < 2:
-        raise ValueError("Incorrect number of arguments")
+        raise IndexError("Incorrect number of arguments")
     idx, tag, *_ = args
+    if tag[0:1] != "#":
+        tag = f"#{tag}"
     note = notes.get_note_by_id(idx)
 
     notes.remove_tag(idx, tag)
-    return f"Tag {tag} removed from note {note.title if note.title else ('#' + note.number)}"
+    return f"Tag {tag} removed from note {note.title if note.title else ('#' + str(note.number))}"
+
+
+@input_error
+def remove_all_tags(notes, args):
+    if not args:
+        raise IndexError("Enter note number")
+    idx = args[0]
+    note = notes.get_note_by_id(idx)
+
+    notes.remove_tag(idx)
+    return f"All tags removed from note {note.title if note.title else ('#' + str(note.number))}"
 
 
 @input_error
@@ -274,8 +291,15 @@ def sort_notes_by_tags(notes, *_):
 
 
 @input_error
+def group_notes_by_tags(notes, *_):
+    return notes.group_notes_by_tags()
+
+
+@input_error
 def find_by_tag(notes, args):
     tag = args[0]
+    if tag[0:1] != "#":
+        tag = f"#{tag}"
     found_notes = notes.find_by_tag(tag)
     if found_notes:
         return found_notes
@@ -313,8 +337,10 @@ NOTES_COMMANDS = {
     "all-notes": get_all_notes,
     "add-tag": add_tag,
     "remove-tag": remove_tag,
+    "remove-all-tags": remove_all_tags,
     'find-tag': find_by_tag,
     'sort-tags': sort_notes_by_tags,
+    'group-tags': group_notes_by_tags,
 }
 
 
@@ -344,6 +370,8 @@ COMMANDS_SYNTAX = {
     "all-notes": "all-notes",
     "add-tag": "add-tag <note_number> <tag>",
     "remove-tag": "remove-tag <note_number> <tag>",
+    "remove-all-tags": "remove-all-tags <note_number>",
     "find-tag": "find-tag <tag>",
-    "sort-tags": "sort-tags"
+    "sort-tags": "sort-tags",
+    "group-tags": "group-tags",
 }

@@ -6,6 +6,8 @@ def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except ValueError as e:
+            return "\n".join(e.args)
         except FormatError as e:
             return "\n".join(e.args)
         except (IndexError, KeyError) as e:
