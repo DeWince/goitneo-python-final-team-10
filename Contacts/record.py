@@ -132,17 +132,17 @@ class Record:
         return self
 
     def set_address(self, address=None):
-        if address == None:
-            self.delete_info("address")
-        else:
+        if address:
             self.add_info("address", Address(address))
+        else:
+            self.delete_info("address")
         return self
 
     def set_birthday(self, birthday=None):
-        if birthday == None:
-            self.delete_info("birthday")
-        else:
+        if birthday:
             self.add_info("birthday", Birthday(birthday))
+        else:
+            self.delete_info("birthday")
         return self
 
     def get_celebrate_date(self, celebrate_year=None):
