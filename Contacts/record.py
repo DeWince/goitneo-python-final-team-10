@@ -7,8 +7,8 @@ class Record:
     fields = {
         "name": "Name",
         "address": "Address",
-        "emails": "E-mail",
-        "phones": "Phone",
+        "emails": "E-mails",
+        "phones": "Phones",
         "birthday": "Birthday"
     }
     sets = ["phones", "emails"]
