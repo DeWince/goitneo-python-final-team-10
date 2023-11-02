@@ -71,7 +71,7 @@ def add_phone(contacts, args):
 @phone_args_error
 @input_error
 def change_phone(contacts, args):
-    name, old_phone, new_phone = args
+    name, old_phone, new_phone, *_ = args
     record = contacts.get_record(name)
     record.change_phone(old_phone, new_phone)
     return f"Phone changed.\n{record}"
@@ -80,7 +80,7 @@ def change_phone(contacts, args):
 @phone_args_error
 @input_error
 def delete_phone(contacts, args):
-    name, phone = args
+    name, phone, *_ = args
     record = contacts.get_record(name)
     record.clear_phone(phone)
     return f"Phone deleted.\n{record}"
@@ -101,7 +101,7 @@ def delete_all_phones(contacts, args):
 @email_args_error
 @input_error
 def add_email(contacts, args):
-    name, email = args
+    name, email, *_ = args
     record = contacts.get_record(name)
     record.add_mail(email)
     return f"Email added.\n{record}"
@@ -110,7 +110,7 @@ def add_email(contacts, args):
 @email_args_error
 @input_error
 def change_email(contacts, args):
-    name, old_email, new_email = args
+    name, old_email, new_email, *_ = args
     record = contacts.get_record(name)
     record.change_mail(old_email, new_email)
     return f"Email changed.\n{record}"
@@ -119,7 +119,7 @@ def change_email(contacts, args):
 @email_args_error
 @input_error
 def delete_email(contacts, args):
-    name, email = args
+    name, email, *_ = args
     record = contacts.get_record(name)
     record.clear_mail(email)
     return f"Email deleted.\n{record}"
@@ -140,7 +140,7 @@ def delete_all_emails(contacts, args):
 @birth_args_error
 @input_error
 def set_birthday(contacts, args):
-    name, birthday = args
+    name, birthday, *_ = args
     record = contacts.get_record(name)
     record.set_birthday(birthday)
     return "Birthday changed."
@@ -191,7 +191,7 @@ def delete_address(contacts, args):
     return f"Birthday deleted.\n{record}"
 
 
-def get_all_contacts(contacts, *args):
+def get_all_contacts(contacts, *_):
     if not contacts.values():
         return "No contacts yet, please use 'add-contact' command to begin"
     return "\n".join(str(record) for record in contacts.values())
