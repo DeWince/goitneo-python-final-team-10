@@ -149,8 +149,10 @@ def set_birthday(contacts, args):
 @input_error
 def get_birthdays_celebration(contacts, *args):
     days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
-    end_text = f"in next {days} days" if days > 1 else "tomorrow"
+    if days < 1:
+        return "Please enter valid number of days!"
     birthdays = contacts.get_birthdays(days)
+    end_text = f"in next {days} days" if days > 1 else "tomorrow"
     if len(birthdays) <= 0:
         return f"No birthdays next {days} day{'s' if days > 1 else ''}"
     return (f"Birthday{'s' if len(birthdays) > 1 else ''} in next {days} day{'s' if days > 1 else ''}:\n" + "\n".join(map(str, birthdays)))
@@ -171,6 +173,8 @@ def delete_birthday(contacts, args):
 @input_error
 def set_address(contacts, args):
     name, *address = args
+    if not address:
+        return "Address missing!"
     record = contacts.get_record(name)
     record.set_address(" ".join(address))
     return f"Address changed.\n{record}"
