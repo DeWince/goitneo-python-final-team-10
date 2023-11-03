@@ -160,7 +160,7 @@ def get_birthdays_celebration(contacts, *args):
 
     if len(birthdays) <= 0:
         return f"No birthdays {end_text}"
-    return (f"Birthday{'s' if len(birthdays) > 1 else ''} in next {days} day{'s' if days > 1 else ''}:\n" + "\n".join(map(str, birthdays)))
+    return (f"{len(birthdays)} Birthday{'s' if len(birthdays) > 1 else ''} {end_text}:\n" + "\n".join(map(str, birthdays)))
 
 
 @input_error
