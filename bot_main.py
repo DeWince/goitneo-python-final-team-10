@@ -22,7 +22,7 @@ def main():
     while True:
         try:
             user_input = input("Enter a command: ")
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, EOFError):
             exit_bot()
 
         command = ""

@@ -16,7 +16,7 @@ class Note:
         if self.title:
             msg += f" - {self.title}"
         if self.tags:
-            msg += f"   [Tags: {', '.join(self.tags)}]"
+            msg += f"   Tags: {' '.join(self.tags)}"
         if len(msg):
             if len(self.text):
                 msg += "\n       "
