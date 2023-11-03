@@ -188,7 +188,7 @@ def delete_address(contacts, args):
         raise FormatError("Please provide a name!")
     record = contacts.get_record(name)
     record.set_address()    # changed method
-    return f"Birthday deleted.\n{record}"
+    return f"Address deleted.\n{record}"
 
 
 def get_all_contacts(contacts, *_):
