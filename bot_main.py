@@ -1,124 +1,54 @@
-
-from Contacts.contacts import Contacts
-from Contacts.record import Record
-from Errors.error_handlers import address_args_error, birth_args_error, contacts_search_args_error, email_args_error, input_error, note_search_args_error, phone_args_error
-from Notes.notes import Notes
-
-@input_error
-def parse_input(user_input):
-    cmd, *args = user_input.split()
-    cmd = cmd.strip().lower()
-    return cmd, *args
-
-@input_error
-def add_contact(args, contacts):
-    name = args[0]
-    if not contacts.contains(name):
-        record = Record(name)
-    else:
-        record = contacts.find(name)
-    contacts.add_record(record)
-    return "Contact added."
-
-@contacts_search_args_error
-@input_error
-def find_contact(args, contacts):
-    pass
-
-@input_error
-def delete_contact(args, contacts):
-    pass
-
-@phone_args_error
-@input_error
-def add_phone(args, contacts):
-    pass
-
-@phone_args_error
-@input_error
-def change_phone(args, contacts):
-    pass
-
-@phone_args_error
-@input_error
-def delete_phone(args, contacts):
-    pass
-
-@email_args_error
-@input_error
-def add_mail(args, contacts):
-    pass
-
-@email_args_error
-@input_error
-def change_mail(args, contacts):
-    pass
-
-@email_args_error
-@input_error
-def delete_mail(args, contacts):
-    pass
-
-@birth_args_error
-@input_error
-def set_birthday(args, contacts):
-    name, bithday = args
-    record = contacts.find(name)
-    record.add_birthday(bithday)
-    return "Bithday changed."
-
-@input_error
-def get_birthdays(contacts):
-    records = contacts.get_birthdays()
-    if len(records) <= 0:
-        return "No birthdays next week"
-    return "Birthdays next week:\n" + "\n".join(map(str, records))
-
-@address_args_error
-@input_error
-def set_address(args, contacts):
-    pass
-
-@input_error
-def add_note(args, notes):
-    pass
-
-@note_search_args_error
-@input_error
-def find_note(args, notes):
-    pass
-
-@input_error
-def delete_note(args, notes):
-    pass
-
-@input_error
-def get_all(contacts):
-    if len(contacts) == 0:
-        return "No contacts yet, please use 'add' command to add them"
-    return "".join(map(lambda x : f"{x}: {contacts[x]}\n", contacts))
-
-def hello_response():
-    return "How can I help you?"
+from file_handler import (
+    read_from_file,
+    write_to_file
+)
+from bot_commands import (
+    parse_input,
+    CONTACTS_COMMANDS,
+    NOTES_COMMANDS,
+    COMMANDS_SYNTAX
+)
 
 
 def main():
-    contacts = Contacts()
-    notes = Notes()
+    contacts, notes = read_from_file()
+
+    def exit_bot():
+        print("\nGood bye!")
+        write_to_file(contacts, notes)
+        exit()
 
     print("Welcome to the assistant bot!")
     while True:
-        user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
-        if command in ["close", "exit"]:
-            print("Good bye!")
-            break
+        try:
+            user_input = input("Enter a command: ")
+        except KeyboardInterrupt:
+            exit_bot()
+
+        command = ""
+        args = []
+        if user_input:
+            command, *args = parse_input(user_input)
+        if command in ["close", "exit", "quit"]:
+            exit_bot()
         elif command == "hello":
-            print(hello_response())
-        #add commands
+            print("How can I help you?")
+        elif command == "help":
+            print("\nCommands syntax:\n" + "\n".join(COMMANDS_SYNTAX.values()))
+        elif command in CONTACTS_COMMANDS:
+            print(CONTACTS_COMMANDS[command](contacts, args))
+            write_to_file(contacts, notes)
+        elif command in NOTES_COMMANDS:
+            print(NOTES_COMMANDS[command](notes, args))
+            write_to_file(contacts, notes)
         else:
-            print("""Invalid command. Use one of following: 
-'hello', 'close', 'exit'""")
+            print("Invalid command. To see all commands use 'help'")
+            contacts_commands = [key for key in CONTACTS_COMMANDS if command in key]
+            notes_commands = [key for key in NOTES_COMMANDS if command in key]
+
+            if contacts_commands or notes_commands:
+                print("Most similar commands:\n" + " | ".join(contacts_commands + notes_commands))
+
 
 if __name__ == "__main__":
     main()
