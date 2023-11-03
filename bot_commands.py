@@ -148,14 +148,19 @@ def set_birthday(contacts, args):
 
 @input_error
 def get_birthdays_celebration(contacts, *args):
-    days = int(args[0][0]) if (len(args) and str(args[0][0]).isdigit()) else 7
-    if days < 1:
+    if len(args[0]) and str(args[0][0]).isdigit():
+        days = int(args[0][0])
+    elif len(args[0]):
         return "Please enter valid number of days!"
+    else:
+        days = 7
+
     birthdays = contacts.get_birthdays(days)
     end_text = f"in next {days} days" if days > 1 else "tomorrow"
+
     if len(birthdays) <= 0:
-        return f"No birthdays next {days} day{'s' if days > 1 else ''}"
-    return (f"Birthday{'s' if len(birthdays) > 1 else ''} in next {days} day{'s' if days > 1 else ''}:\n" + "\n".join(map(str, birthdays)))
+        return f"No birthdays {end_text}"
+    return (f"{len(birthdays)} Birthday{'s' if len(birthdays) > 1 else ''} {end_text}:\n" + "\n".join(map(str, birthdays)))
 
 
 @input_error
