@@ -2,6 +2,8 @@
 
 Final project for **GoIt-neo Python**
 
+To use this bot run bot_main.py
+
 This bot is capable of adding contacts to your contacts list and creating notes
 
 Project architecture is described in figma:
